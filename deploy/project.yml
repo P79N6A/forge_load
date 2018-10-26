@@ -1,0 +1,48 @@
+#!/usr/bin/env ansible-playbook
+- name: Setup work environment
+  hosts: 
+    # - ec
+    # - te
+    # - intra
+    - spare
+    - cpp
+    - java
+  tasks: 
+    - name: create user directory
+      file: 
+        path: /{{ base_dir }}/{{ item }}/
+        state: directory
+        owner: yandi
+        group: yandi
+      with_items:
+        - project
+        - home
+        - modules
+        - tmp
+
+- name: Setup service
+  hosts: 
+    # - ec
+    # - te
+    # - intra
+    - spare
+    - cpp
+    - java
+  tasks:
+    - name: rsync repository
+      become_user: yandi
+      synchronize:
+        mode: pull
+        src: "rsync://10.77.136.42/yandi/{{ project_name }}/"
+        dest: "{{ project_dir }}/{{ project_name }}/"
+        compress: yes
+        archive: yes
+        delete: no
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=*.pyc"
+          - "--exclude=log"
+          - "--exclude=start.sh"
+      delegate_to: "{{ inventory_hostname }}"
+      environment: 
+        RSYNC_PASSWORD: '11235'

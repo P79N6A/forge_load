@@ -1,0 +1,13 @@
+#!/usr/bin/env ansible-playbook
+- name: Start containers
+  hosts: 
+    - ec
+    - te
+    - intra
+    - spare
+    - cpp
+  serial: 10
+  tasks:
+    - name: stop container
+      become_user: yandi
+      shell: pkill -f 'python.*cpu_load'

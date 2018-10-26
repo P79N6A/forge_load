@@ -1,0 +1,17 @@
+#!/usr/bin/env ansible-playbook
+- name: Start containers
+  hosts: 
+    - ec
+    - te
+    - intra
+    - spare
+    - cpp
+    - java
+  serial: 2
+  tasks:
+    - name: start container
+      become_user: yandi
+      shell: >
+        nohup python cpu_load.py "{{ ratio }}" &
+      args:
+        chdir: "{{ project_dir }}/{{ project_name }}"

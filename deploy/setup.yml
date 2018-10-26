@@ -1,0 +1,151 @@
+#!/usr/bin/env ansible-playbook
+- name: Install yum repository
+  hosts: ec
+  tasks: 
+    - name: Add 163 Repo
+      yum_repository:
+        name: base
+        description: CentOS-$releasever - Base - 163.com
+        baseurl: http://mirrors.163.com/centos/$releasever/os/$basearch/
+        gpgcheck: 1
+        gpgkey: http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+        file: CentOS7-Base-163
+
+    - name: Add 163 Repo
+      yum_repository:
+        name: updates
+        description: CentOS-$releasever - Base - 163.com
+        baseurl: http://mirrors.163.com/centos/$releasever/updates/$basearch/
+        gpgcheck: 1
+        gpgkey: http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+        file: CentOS7-Base-163
+
+    - name: Add 163 Repo
+      yum_repository:
+        name: extras
+        description: CentOS-$releasever - Extras - 163.com
+        baseurl: http://mirrors.163.com/centos/$releasever/extras/$basearch/
+        gpgcheck: 1
+        gpgkey: http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+        file: CentOS7-Base-163
+
+    - name: Add 163 Repo
+      yum_repository:
+        name: centosplus
+        description: CentOS-$releasever - Plus - 163.com
+        baseurl: http://mirrors.163.com/centos/$releasever/centosplus/$basearch/
+        gpgcheck: 1
+        enabled: 0
+        gpgkey: http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+        file: CentOS7-Base-163
+
+    - name: Add Docker Repo
+      yum_repository:
+        name: docker_engine
+        baseurl: https://packages.docker.com/1.13/yum/repo/main/centos/7
+        gpgcheck: 1
+        gpgcheck: https://pgp.mit.edu/pks/lookup?op=get&search=0xee6d536cf7dc86e2d7d56f59a178ac6c6238f52e
+          
+    - name: yum-clean-metadata
+      command: yum clean metadata
+      args:
+        warn: no
+
+
+- name: Install yum packages
+  hosts: ec
+  become_user: root
+  tasks:
+    - name: install yum packages
+      yum: name={{ item }} update_cache=yes 
+      with_items:
+        - git
+        - iotop
+        - yum-utils 
+        - device-mapper-persistent-data 
+        - lvm2
+        - python-pip
+        - python-virtualenv
+    - name: install python pip
+      pip: name=pip state=latest
+
+
+- name: Setup docker
+  hosts: ec
+  become_user: root
+  tasks:
+    - name: install docker
+      yum: 
+        name: docker-engine-1.13.1.cs7
+        update_cache: yes
+        state: present
+        # disablerepo: "sinawatch-agent"
+    - name: copy config files, config bridge network
+      copy: 
+        src: files/etc/sysconfig/docker 
+        dest: /etc/sysconfig/docker
+        backup: yes
+    - name: copy config files, config storage
+      copy: 
+        src: files/etc/sysconfig/docker-storage
+        dest: /etc/sysconfig/docker-storage
+        backup: yes
+    - name: copy config files, config dns
+      copy: 
+        src: files/etc/docker/daemon.json
+        dest: /etc/docker/daemon.json
+        backup: yes
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add user to docker group
+      user:
+        name: yandi
+        groups: docker
+        append: yes
+    - name: restart service docker
+      service: 
+        name: docker
+        state: restarted
+    - name: install python docker bindings
+      pip: name={{ item }}
+      with_items:
+        - docker
+
+
+- name: Setup nginx 
+  hosts: ec
+  become_user: root
+  tasks:
+    - name: check registered the repository of nginx-release
+      shell: rpm -qa | grep nginx-release
+      register: result
+      ignore_errors: True
+      changed_when: no
+    - name: add repository nginx-release (CentOS6/CentOS7)
+      yum: name="http://nginx.org/packages/centos/{{ansible_distribution_major_version}}/noarch/RPMS/nginx-release-centos-{{ansible_distribution_major_version}}-0.el{{ansible_distribution_major_version}}.ngx.noarch.rpm"
+      when: result|failed
+    - name: disable the repository (pls set --enablerepo=nginx if you use it)
+      replace: dest=/etc/yum.repos.d/nginx.repo regexp="enabled *= *1" replace="enabled=0"
+      ignore_errors: True
+    - name: install nginx
+      yum: name=nginx state=present enablerepo=nginx
+    - name: start
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+    - name: copy config in place
+      template:
+        src: files/etc/nginx/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - reload nginx
+  handlers:
+    - name: reload nginx
+      service: name=nginx state=reloaded
+

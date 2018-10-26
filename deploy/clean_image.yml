@@ -1,0 +1,12 @@
+#!/usr/bin/env ansible-playbook
+- name: remove untagged docker images
+  hosts: 
+    - ec
+  tasks: 
+    - name: unload old images
+      shell: > 
+        docker images | grep "^<none>" | awk '{print $3}' |
+        while read -r image_id; do
+          docker rmi $image_id;
+        done
+
