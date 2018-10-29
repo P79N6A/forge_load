@@ -1,9 +1,8 @@
 #!/usr/bin/env ansible-playbook
 - name: Setup work environment
   hosts: 
-    # - ec
-    # - te
-    # - intra
+    - ec
+    - intra
     - spare
     - cpp
     - java
@@ -22,9 +21,8 @@
 
 - name: Setup service
   hosts: 
-    # - ec
-    # - te
-    # - intra
+    - ec
+    - intra
     - spare
     - cpp
     - java
@@ -33,7 +31,7 @@
       become_user: yandi
       synchronize:
         mode: pull
-        src: "rsync://10.77.136.42/yandi/{{ project_name }}/"
+        src: "rsync://10.85.115.122/yandi/{{ project_name }}/"
         dest: "{{ project_dir }}/{{ project_name }}/"
         compress: yes
         archive: yes

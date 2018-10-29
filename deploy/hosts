@@ -61,13 +61,14 @@ ec204 ansible_ssh_host=10.85.162.204 ansible_ssh_user=yandi
 
 
 [ec]
-ec[181:183]
+ec[181:185]
+in[6:7]
 
 [ec:vars]
 base_dir=/data0/yandi/
 project_dir=/data0/yandi/project/
 project_name=cpu_load
-ratio=0.3
+ratio=0.7
 
 [cpp]
 ec[156:172]
@@ -76,7 +77,7 @@ ec[156:172]
 base_dir=/data0/yandi/
 project_dir=/data0/yandi/project/
 project_name=cpu_load
-ratio=0.3
+ratio=0.7
 
 [java]
 ec[194:204]
@@ -105,14 +106,4 @@ in71
 base_dir=/data0/users/yandi/
 project_dir=/data0/users/yandi/project/
 project_name=cpu_load
-ratio=0.45
-
-[te]
-in[6:7]
-
-[te:vars]
-base_dir=/data0/yandi/
-project_dir=/data0/yandi/project/
-project_name=cpu_load
-ratio=0.4
-
+ratio=0.65

@@ -3,16 +3,21 @@
 ##################################################
 # AUTHOR : Yandi LI
 # CREATED_AT : 2018-03-07
-# LAST_MODIFIED : 2018-03-07 17:29:57
+# LAST_MODIFIED : 2018-10-29 12:08:18
 # USAGE : python cpu_load.py
-# PURPOSE : TODO
+# PURPOSE : 每天3点定时启动一个小时，提高CPU利用率
 ##################################################
 from multiprocessing import Pool
 from multiprocessing import cpu_count
+from datetime import datetime
+import time
 
 def f(x):
   while True:
-    x * x
+    if datetime.now().hour != 3:
+      time.sleep(60)
+    else:
+      x * x
 
 
 if __name__ == '__main__':
