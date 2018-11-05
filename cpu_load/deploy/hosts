@@ -15,6 +15,8 @@ ec10 ansible_ssh_host=10.85.125.10 ansible_ssh_user=yandi
 ec11 ansible_ssh_host=10.85.125.11 ansible_ssh_user=yandi
 ec12 ansible_ssh_host=10.85.125.12 ansible_ssh_user=yandi
 
+ec122 ansible_ssh_host=10.85.115.122 ansible_ssh_user=yandi
+
 ec156 ansible_ssh_host=10.85.162.156 ansible_ssh_user=yandi
 ec157 ansible_ssh_host=10.85.162.157 ansible_ssh_user=yandi
 ec158 ansible_ssh_host=10.85.162.158 ansible_ssh_user=yandi
@@ -46,6 +48,7 @@ ec183 ansible_ssh_host=10.85.162.183 ansible_ssh_user=yandi
 ec184 ansible_ssh_host=10.85.162.184 ansible_ssh_user=yandi
 ec185 ansible_ssh_host=10.85.162.185 ansible_ssh_user=yandi
 ec186 ansible_ssh_host=10.85.162.186 ansible_ssh_user=yandi
+ec187 ansible_ssh_host=10.85.162.187 ansible_ssh_user=yandi
 
 ec194 ansible_ssh_host=10.85.162.194 ansible_ssh_user=yandi
 ec195 ansible_ssh_host=10.85.162.195 ansible_ssh_user=yandi
@@ -68,7 +71,7 @@ in[6:7]
 base_dir=/data0/yandi/
 project_dir=/data0/yandi/project/
 project_name=cpu_load
-ratio=0.7
+ratio=0.75
 
 [cpp]
 ec[156:172]
@@ -77,7 +80,7 @@ ec[156:172]
 base_dir=/data0/yandi/
 project_dir=/data0/yandi/project/
 project_name=cpu_load
-ratio=0.7
+ratio=0.75
 
 [java]
 ec[194:204]
@@ -86,24 +89,25 @@ ec[194:204]
 base_dir=/data0/yandi/
 project_dir=/data0/yandi/project/
 project_name=cpu_load
-ratio=0.5
+ratio=0.7
 
 [spare]
-ec[173:179]
-ec186
+ec[173:180]
+ec[186:187]
 
 [spare:vars]
 base_dir=/data0/yandi/
 project_dir=/data0/yandi/project/
 project_name=cpu_load
-ratio=0.9
+ratio=0.85
 
 
 [intra]
 in71
+ec122
 
 [intra:vars]
 base_dir=/data0/users/yandi/
 project_dir=/data0/users/yandi/project/
 project_name=cpu_load
-ratio=0.65
+ratio=0.7

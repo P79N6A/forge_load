@@ -2,7 +2,6 @@
 - name: Start containers
   hosts: 
     - ec
-    - te
     - intra
     - spare
     - cpp
