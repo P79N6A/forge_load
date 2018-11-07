@@ -3,9 +3,9 @@
 ##################################################
 # AUTHOR : Yandi LI
 # CREATED_AT : 2018-11-01
-# LAST_MODIFIED : 2018-11-06 21:05:10
-# USAGE : python test2.py
-# PURPOSE : TODO
+# LAST_MODIFIED : 2018-11-07 12:28:02
+# USAGE : python -u main.py
+# PURPOSE : GPU占用程序
 ##################################################
 from __future__ import division
 import math
@@ -19,6 +19,8 @@ import numpy
 cuda.select_device(0)
 
 class Monitor(threading.Thread):
+  """ 后台检测当前GPU占用率
+  """
 
   def __init__(self):
     super(Monitor, self).__init__()
@@ -46,6 +48,10 @@ class Monitor(threading.Thread):
 
 
 class Worker(object):
+  """ GPU占用程序
+  - 根据目标target，自动调整需要用到的blocks数量
+  - 如果monitor检测有其他程序争抢GPU，峰值超过阈值，则自动切断运行
+  """
 
   def __init__(self, target=50):
     data = numpy.zeros(512)
@@ -73,11 +79,30 @@ class Worker(object):
   def run_awhile(self, sec=10):
     start = time.time()
     while time.time() - start < sec:
-      self.my_kernel[self.multiplier * self.blockspergrid, self.threadsperblock](self._device_data)
+      self.my_kernel[int(self.multiplier * self.blockspergrid), self.threadsperblock](self._device_data)
 
 
   def idle_awhile(self, sec=5):
     time.sleep(sec)
+   
+
+  def _boost(self, rate=1.2):
+    self.multiplier *= rate
+
+
+  def _slow_down(self, rate=1.5):
+    self.multiplier /= rate
+    
+
+  def adjust_speed(self, avg_load):
+    if avg_load < self.target * 0.8:
+      self._boost()
+      print("Adjusted speed: boost")
+      return 
+    if avg_load > self.target * 1.2:
+      self._slow_down()
+      print("Adjusted speed: slow_down")
+      return 
 
 
   @classmethod
@@ -91,17 +116,18 @@ class Worker(object):
     print("Initial average load", monitor.avg_load)
 
     while True:
-      if monitor.max_load > worker.target:
+      if monitor.max_load > worker.target * 1.1:
         print("Idle for 5s with load %s" % monitor.max_load)
         worker.idle_awhile(5)
         continue
 
-      print("Run for 10s with load %s" % monitor.avg_load)
+      print("Run for 10s with load %s and multiplier %s" % (monitor.avg_load, worker.multiplier))
       worker.run_awhile(10)
-      # if monitor.max_load > worker.target:
-      #   continue
+      worker.adjust_speed(monitor.avg_load)
 
 
 
 if __name__ == "__main__":
-  Worker.main(target=50)
+  import os
+  target = float(os.environ.get("TARGET", 50))
+  Worker.main(target)

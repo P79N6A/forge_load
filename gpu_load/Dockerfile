@@ -48,3 +48,7 @@ ARG project_dir=/home/
 RUN mkdir -p ${project_dir}
 
 COPY *py ${project_dir}/${project_name}/
+
+WORKDIR "${project_dir}/${project_name}" 
+
+CMD ["python", "-u", "main.py"]
