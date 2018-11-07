@@ -3,7 +3,7 @@
 ##################################################
 # AUTHOR : Yandi LI
 # CREATED_AT : 2018-11-01
-# LAST_MODIFIED : 2018-11-07 12:28:02
+# LAST_MODIFIED : 2018-11-07 12:55:32
 # USAGE : python -u main.py
 # PURPOSE : GPU占用程序
 ##################################################
@@ -95,7 +95,7 @@ class Worker(object):
     
 
   def adjust_speed(self, avg_load):
-    if avg_load < self.target * 0.8:
+    if avg_load < self.target * 0.9:
       self._boost()
       print("Adjusted speed: boost")
       return 

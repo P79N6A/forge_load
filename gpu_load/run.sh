@@ -8,7 +8,7 @@ project_name=forge_load_gpu_${NV_GPU}
 case "$option" in 
 test)
   NV_GPU=${NV_GPU} nvidia-docker run -it --rm \
-    yandi/load:0.1-gpu bash
+    yandi/forge_load:0.1-gpu bash
   ;;
 stop)
   docker rm -f ${project_name}

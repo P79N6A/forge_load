@@ -1,4 +1,4 @@
-FROM nvidia/cuda
+FROM nvidia/cuda:8.0-cudnn5-devel
 
 MAINTAINER Boris LI <liyandi007@163.com>
 
@@ -33,8 +33,9 @@ ENV LC_CTYPE=zh_CN.UTF-8
 ENV LC.MESSAGES=zh_CN.UTF-8
 ENV LC_TIME=en_US.UTF-8
 ENV PYTHONIOENCODING="utf-8"
-ENV NUMBAPRO_NVVM=/usr/local/cuda-8.0/nvvm/lib64/libnvvm.so
-ENV NUMBAPRO_LIBDEVICE=/usr/local/cuda-8.0/nvvm/libdevice/
+
+ENV NUMBAPRO_NVVM=/usr/local/cuda/nvvm/lib64/libnvvm.so
+ENV NUMBAPRO_LIBDEVICE=/usr/local/cuda/nvvm/libdevice/
 
 ## SET TIMEZONE
 RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
